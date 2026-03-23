@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,12 +19,14 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/", "/home", "/error", "/register", "/login").permitAll()
+				.requestMatchers(HttpMethod.GET, "/", "/home", "/courses", "/error", "/register", "/login").permitAll()
 				.requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/static/**").permitAll()
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.requestMatchers("/enroll/**").hasRole("STUDENT")
 				.requestMatchers("/my-courses").hasRole("STUDENT")
-				.requestMatchers("/courses", "/courses/**").permitAll()
+				.requestMatchers(HttpMethod.GET, "/courses/new", "/courses/*/edit").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.POST, "/courses", "/courses/*", "/courses/*/delete").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.formLogin(form -> form
